@@ -1,9 +1,9 @@
 import ScanbotSDK from "scanbot-web-sdk";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 
 const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
-    const [sdkInstance, setSdkInstance] = useState(null)
+    // const [sdkInstance, setSdkInstance] = useState(null)
 
     const LICENSE_KEY =
         "hEH0Wbx1pZJdQXqRVrvGc0yiGpAEPX" +
@@ -26,22 +26,24 @@ const Scanbot = () => {
     // Please refer to the corresponding setup guide in our documentation:
     // https://docs.scanbot.io
 
-    useEffect(() => {
-        const initialize = async () => {
-            const init = await ScanbotSDK.initialize({
-                licenseKey:LICENSE_KEY,
-                scannermode: "document",
-            })
-            if(init) setSdkInstance(init)
-        }
-        initialize()
-    },[])
+    // useEffect(() => {
+    //     const initialize = async () => {
+    //         const init = await ScanbotSDK.initialize({
+    //             licenseKey:LICENSE_KEY,
+    //             scannermode: "document",
+    //         })
+    //         if(init) setSdkInstance(init)
+    //     }
+    //     initialize()
+    // },[])
+
+    const scanbotSdkRef = useRef(null);
+    const [scannedImage, setScannedImage] = useState(null);
 
     const handleDcoumentScanner = async () => {
         try {
             const config = {
                 containerId: DOCUMENT_SCANNER_CONTAINER,
-                onDocumentDetected: result => {console.log("document detected result", result)},
                 text: {
                     hint: {
                         OK: "Capturing your document...",
@@ -91,11 +93,30 @@ const Scanbot = () => {
                 preferredCamera: 'camera2 0, facing back',
                 onerror: (error) => { console.log("error while running the scanner", error) }
             };
+            const sdkInstance = await ScanbotSDK.initialize({
+                licenseKey: LICENSE_KEY
+            })
 
-            const documentScanner = await sdkInstance.createDocumentScanner(config);
-            if(documentScanner) await documentScanner.dispose();
+            // await sdkInstance.createDocumentScanner(config);
+            // if(documentScanner) documentScanner.dispose();
 
-            console.log("documentScanner result", documentScanner);
+            // Initialize the Scanbot Web SDK
+            scanbotSdkRef.current = sdkInstance.detectAndCropDocument(config)
+
+            // Start the camera when the component loads
+            scanbotSdkRef.current.startCamera();
+
+            // Listen for scan completion
+            scanbotSdkRef.current.on("scanComplete", (scanResult) => {
+                // Handle the scan result here
+                if (scanResult.document) {
+                    // Extract the scanned image from the result
+                    const scannedImageUrl = scanResult.document.croppedImage;
+                    console.log("Scanned Image URL:", scannedImageUrl);
+                    setScannedImage(scannedImageUrl); // Store the image URL in state
+                    sdkInstance.dispose()
+                }
+        })
 
         } catch (error) {
             console.log("error while scanning", error)
