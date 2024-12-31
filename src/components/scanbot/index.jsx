@@ -92,13 +92,20 @@ const Scanbot = () => {
                 onerror: (error) => { console.log("error while running the scanner", error) }
             };
 
-            const documentScanner = await sdkInstance.createDocumentScanner(config)
+            const documentScanner = await sdkInstance.createDocumentScanner(config);
+            const capturedImage = await sdkInstance.enableAutoCapture();
 
-            console.log("documentScanner result", documentScanner)
+            console.log("documentScanner result", documentScanner);
+            console.log("capturedImage", capturedImage)
 
         } catch (error) {
             console.log("error while scanning", error)
         }
+    }
+    const scannerDimensionObject = {
+        width:'1280px',
+        height:"720px",
+        border:"2px solid red",
     }
 
     return (
@@ -106,7 +113,7 @@ const Scanbot = () => {
             <h2>Document Scanner</h2>
 
             {/* Document Scanner UI Container */}
-            <div id={DOCUMENT_SCANNER_CONTAINER}>
+            <div id={DOCUMENT_SCANNER_CONTAINER} style={scannerDimensionObject}>
                 <h3>Scanbot</h3>
                 <button onClick={() => handleDcoumentScanner()}>Click Me!!!</button>
             </div>
