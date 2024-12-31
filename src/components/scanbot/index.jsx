@@ -29,7 +29,8 @@ const Scanbot = () => {
     useEffect(() => {
         const initialize = async () => {
             const init = await ScanbotSDK.initialize({
-                licenseKey:LICENSE_KEY
+                licenseKey:LICENSE_KEY,
+                scannermode: "document",
             })
             if(init) setSdkInstance(init)
         }
@@ -40,7 +41,7 @@ const Scanbot = () => {
         try {
             const config = {
                 containerId: DOCUMENT_SCANNER_CONTAINER,
-                onDocumentDetected: () => { console.log("document detected") },
+                onDocumentDetected: result => {console.log("document detected result", result)},
                 text: {
                     hint: {
                         OK: "Capturing your document...",
@@ -57,15 +58,34 @@ const Scanbot = () => {
                     },
                 },
                 style: {
-                    // Note that alternatively, styling the document scanner is also possible using CSS classes.
-                    // For details see https://docs.scanbot.io/document-scanner-sdk/web/features/document-scanner/document-scanner-ui/
                     outline: {
                         polygon: {
-                            fillCapturing: "rgba(0, 255, 0, 0.2)",
                             strokeCapturing: "green",
-                            fillSearching: "rgba(255, 0, 0, 0.2)",
-                            strokeSearching: "red",
+                            strokeSearching: "yellow",
+                            fillCapturing: "transparent",
+                            fillSearching: "transparent",
+                            strokeWidth: "2px"
+                        },
+                        label: {
+                            position: "absolute",
+                            top: "90%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            textAlign: "center",
+                            backgroundColor: "rgba(0, 0, 0, 0.7)",
+                            color: "white",
+                            borderRadius: "0.25em",
+                            padding: "0.5em",
+                            fontFamily: "sans-serif",
+                            fontSize: "1em"
+                        },
+                        path: {
+                             stroke: "green",
+                             strokeWidth: 4,
                         }
+                    },
+                    captureButton: {
+                        color: "white"
                     }
                 },
                 preferredCamera: 'camera2 0, facing back',
@@ -82,7 +102,7 @@ const Scanbot = () => {
     }
 
     return (
-        <div style={{ height: "100%" }}>
+        <div style={{ height: "100%", width:"100%" }}>
             <h2>Document Scanner</h2>
 
             {/* Document Scanner UI Container */}
