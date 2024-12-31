@@ -96,26 +96,13 @@ const Scanbot = () => {
                 licenseKey: LICENSE_KEY
             })
 
-            // await sdkInstance.createDocumentScanner(config);
+            await sdkInstance.createDocumentScanner(config);
             // if(documentScanner) documentScanner.dispose();
 
             // Initialize the Scanbot Web SDK
-            scanbotSdkRef.current = sdkInstance.detectAndCropDocument(config)
+            scanbotSdkRef.current = sdkInstance.detectAndCropDocument()
+            console.log("scanbotRef", scanbotSdkRef)
 
-            // Start the camera when the component loads
-            scanbotSdkRef.current.startCamera();
-
-            // Listen for scan completion
-            scanbotSdkRef.current.on("scanComplete", (scanResult) => {
-                // Handle the scan result here
-                if (scanResult.document) {
-                    // Extract the scanned image from the result
-                    const scannedImageUrl = scanResult.document.croppedImage;
-                    console.log("Scanned Image URL:", scannedImageUrl);
-                    setScannedImage(scannedImageUrl); // Store the image URL in state
-                    sdkInstance.dispose()
-                }
-        })
 
         } catch (error) {
             console.log("error while scanning", error)
