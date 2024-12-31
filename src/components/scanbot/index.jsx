@@ -28,6 +28,7 @@ const Scanbot = () => {
         try {
             const config = {
                 containerId: DOCUMENT_SCANNER_CONTAINER,
+                onDocumentDetected: () => { console.log("document detected") },
                 text: {
                     hint: {
                         OK: "Capturing your document...",
@@ -59,9 +60,11 @@ const Scanbot = () => {
                 onerror: (error) => { console.log("error while running the scanner", error) }
             };
             const sdkInstance = await ScanbotSDK.initialize({
-                licenseKey: LICENSE_KEY
+                licenseKey: LICENSE_KEY,
+                engine: 'wasm'
             })
-            const documentScanner = sdkInstance.createDocumentScanner(config)
+            if(sdkInstance) console.log("sdkinstance", sdkInstance)
+            const documentScanner = await sdkInstance.createDocumentScanner(config)
 
             console.log("documentScanner result", documentScanner)
 
