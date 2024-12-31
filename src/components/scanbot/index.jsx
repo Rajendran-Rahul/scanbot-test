@@ -1,7 +1,9 @@
 import ScanbotSDK from "scanbot-web-sdk";
+import { useEffect, useState } from "react";
 
 const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
+    const [sdkInstance, setSdkInstance] = useState(null)
 
     const LICENSE_KEY =
         "hEH0Wbx1pZJdQXqRVrvGc0yiGpAEPX" +
@@ -23,6 +25,16 @@ const Scanbot = () => {
     // Pass the license key to the Scanbot SDK to initialize it.
     // Please refer to the corresponding setup guide in our documentation:
     // https://docs.scanbot.io
+
+    useEffect(() => {
+        const initialize = async () => {
+            const init = await ScanbotSDK.initialize({
+                licenseKey:LICENSE_KEY
+            })
+            if(init) setSdkInstance(init)
+        }
+        initialize()
+    },[])
 
     const handleDcoumentScanner = async () => {
         try {
@@ -59,11 +71,7 @@ const Scanbot = () => {
                 preferredCamera: 'camera2 0, facing back',
                 onerror: (error) => { console.log("error while running the scanner", error) }
             };
-            const sdkInstance = await ScanbotSDK.initialize({
-                licenseKey: LICENSE_KEY,
-                engine: 'wasm'
-            })
-            if(sdkInstance) console.log("sdkinstance", sdkInstance)
+
             const documentScanner = await sdkInstance.createDocumentScanner(config)
 
             console.log("documentScanner result", documentScanner)
