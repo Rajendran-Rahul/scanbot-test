@@ -4,20 +4,25 @@ const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
 
     const LICENSE_KEY =
-        "DuPrNE/G7iEBjaISOl3xJm4HvhaQyF" +
-        "WXm7fqXbIVU5pVJn+qTxPUjda0uy+x" +
-        "zOBBL6Tki9F58uw+w8LNLFQtJUDNg/" +
-        "zWTBG/Bn5LRD3aPALGohll0RLeNnFs" +
-        "6Fht2gZl7k/FSbLzLKswYpKCNlKUyH" +
-        "qog4QgzIVLb4P0z7WkHcidWkOlliWK" +
-        "V7XL3iynYydebiH6B8rG5cIW2N9Ktm" +
-        "Z4n9lhQFBpqEqmx2jlg3Wn3hDFYyJS" +
-        "7GCE362mH7EtcXeM5gS17GIQmgkcEi" +
-        "4YJsSIs2bgVJ+1GtulkG1SPEyp1gkN" +
-        "8kzgdWt2lVJUbm3HcCtN5cjd5T4Uce" +
-        "1z0q5X6nN9Iw==\nU2NhbmJvdFNESw" +
-        "psb2NhbGhvc3R8eW9zaS5oZWFsdGgK" +
-        "MTczNjI5NDM5OQo4Mzg4NjA3Cjg=\n";
+        "hEH0Wbx1pZJdQXqRVrvGc0yiGpAEPX" +
+        "/2P8qVF0qND02w5r/e9VyIsXVItu/9" +
+        "E3b9caVgSNPpg4DAnE1rUn9v1SNLqW" +
+        "5fM/ripSXPMnkNUkoUdrYkI4rK/1lE" +
+        "XjQcjoxRu0BBoLKVuMGZ4tYe3kalp2" +
+        "eqMljYfdfMht4MScgMHLto33HwpLCK" +
+        "xkISTMYDnNevrY1Yjea0j55ktc/vRl" +
+        "pLrd1TMa49HbqGEkn/fhcVNY800el6" +
+        "7Cq51HzgnI2cElCL5kb0Vl9QdzT8KX" +
+        "bT+pBnDmvBuTWG7AXtUF+caXrL4UPH" +
+        "z0cG14HxAMNfvcjqJauliZYBANciZB" +
+        "9sDP7s3WIy/g==\nU2NhbmJvdFNESw" +
+        "psb2NhbGhvc3R8c2NhbmJvdC10ZXN0" +
+        "LnZlcmNlbC5hcHAKMTczNjI5NDM5OQ" +
+        "o4Mzg4NjA3Cjg=\n";
+
+    // Pass the license key to the Scanbot SDK to initialize it.
+    // Please refer to the corresponding setup guide in our documentation:
+    // https://docs.scanbot.io
 
     const handleDcoumentScanner = async () => {
         try {
