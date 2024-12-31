@@ -91,7 +91,6 @@ const Scanbot = () => {
                     },
                 },
                 preferredCamera: 'camera2 0, facing back',
-                onerror: (error) => { console.log("error while running the scanner", error) }
             };
             const sdkInstance = await ScanbotSDK.initialize({
                 licenseKey: LICENSE_KEY
