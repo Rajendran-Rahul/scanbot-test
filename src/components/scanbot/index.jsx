@@ -93,10 +93,8 @@ const Scanbot = () => {
             };
 
             const documentScanner = await sdkInstance.createDocumentScanner(config);
-            const capturedImage = await sdkInstance.enableAutoCapture();
 
             console.log("documentScanner result", documentScanner);
-            console.log("capturedImage", capturedImage)
 
         } catch (error) {
             console.log("error while scanning", error)
@@ -109,7 +107,7 @@ const Scanbot = () => {
     }
 
     return (
-        <div style={{ height: "100%", width:"100%" }}>
+        <div>
             <h2>Document Scanner</h2>
 
             {/* Document Scanner UI Container */}
