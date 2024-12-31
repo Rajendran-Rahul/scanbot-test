@@ -86,13 +86,14 @@ const Scanbot = () => {
                     },
                     captureButton: {
                         color: "white"
-                    }
+                    },
                 },
                 preferredCamera: 'camera2 0, facing back',
                 onerror: (error) => { console.log("error while running the scanner", error) }
             };
 
             const documentScanner = await sdkInstance.createDocumentScanner(config);
+            if(documentScanner) await documentScanner.dispose();
 
             console.log("documentScanner result", documentScanner);
 
@@ -101,8 +102,8 @@ const Scanbot = () => {
         }
     }
     const scannerDimensionObject = {
-        width:'1280px',
-        height:"720px",
+        width:'600px',
+        height:"400px",
         border:"2px solid red",
     }
 
