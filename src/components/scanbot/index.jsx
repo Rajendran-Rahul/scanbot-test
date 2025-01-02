@@ -89,9 +89,12 @@ const Scanbot = () => {
         onDocumentDetected: result => handleDocumentDetection(result)
     }
 
+    const scannerInstance = () => ScanbotSDK.instance.createDocumentScanner(scannerConfig)
+
     const handleDocumentScanner = async () => {
         try {
-            (await ScanbotSDK.instance.createDocumentScanner(scannerConfig)).enableAutoCapture()
+            ((await scannerInstance()).enableAutoCapture())
+            setCount((prev) => prev+1)
         } catch (error) {
             console.log("ERROR:", error)
         }
@@ -103,6 +106,7 @@ const Scanbot = () => {
         const blob = new Blob([uint8Array], { type: 'image/jpeg' });
         const imageUrl = URL.createObjectURL(blob);
         if (imageUrl) {
+            (await scannerInstance()).disableAutoCapture()
             setImgUrl(imageUrl)
         }
     }
