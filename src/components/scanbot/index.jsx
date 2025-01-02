@@ -1,4 +1,5 @@
 import ScanbotSDK from "scanbot-web-sdk";
+import "./scanbot.css"
 
 const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
@@ -80,17 +81,12 @@ const Scanbot = () => {
             };
 
             const initializeScanner = await ScanbotSDK.initialize({ licenseKey: LICENSE_KEY, engine: "wasm" });
-            const createScanner = (await initializeScanner.createDocumentScanner(config)).enableAutoCapture()
+            const createScanner = (await initializeScanner.createDocumentScanner(config)).disableAutoCapture()
             console.log("createScanner", createScanner)
 
         } catch (error) {
             console.log("ERROR:", error)
         }
-    }
-    const scannerDimensionObject = {
-        width: '600px',
-        height: "400px",
-        border: "2px solid red",
     }
 
     return (
@@ -98,7 +94,7 @@ const Scanbot = () => {
             <h2>Document Scanner</h2>
 
             {/* Document Scanner UI Container */}
-            <div id={DOCUMENT_SCANNER_CONTAINER} style={scannerDimensionObject}>
+            <div id={DOCUMENT_SCANNER_CONTAINER} style={{position:"relative"}}>
                 <h3>Scanbot</h3>
                 <button onClick={() => handleDcoumentScanner()}>Click Me!!!</button>
             </div>
