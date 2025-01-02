@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
-    const [scannerInstance, setScannerInstance] = useState(null)
 
     const LICENSE_KEY =
         "hEH0Wbx1pZJdQXqRVrvGc0yiGpAEPX" +
@@ -39,68 +38,60 @@ const Scanbot = () => {
 
     const [imgUrl, setImgUrl] = useState("")
 
-    const basicConfig = {
+    const scannerConfig = {
         containerId: DOCUMENT_SCANNER_CONTAINER,
+        text: {
+            hint: {
+                OK: "Capturing your document...",
+                OK_SmallSize: "The document is too small. Try moving closer.",
+                OK_BadAngles:
+                    "This is a bad camera angle. Hold the device straight over the document.",
+                OK_BadAspectRatio:
+                    "Rotate the device sideways, so that the document fits better into the screen.",
+                OK_OffCenter: "Try holding the device at the center of the document.",
+                Error_NothingDetected:
+                    "Please hold the device over a document to start scanning.",
+                Error_Brightness: "It is too dark. Try turning on a light.",
+                Error_Noise: "Please move the document to a clear surface.",
+            },
+        },
+        style: {
+            outline: {
+                polygon: {
+                    fillCapturing: "rgba(0, 255, 0, 0.2)",
+                    strokeCapturing: "green",
+                    fillSearching: "rgba(255, 0, 0, 0.2)",
+                    strokeSearching: "red",
+                },
+                label: {
+                    position: "absolute",
+                    top: "90%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    textAlign: "center",
+                    backgroundColor: "rgba(0, 0, 0, 0.7)",
+                    color: "white",
+                    borderRadius: "0.25em",
+                    padding: "0.5em",
+                    fontFamily: "sans-serif",
+                    fontSize: "1em"
+                },
+                path: {
+                    stroke: "green",
+                    strokeWidth: 4,
+                }
+            },
+            captureButton: {
+                color: "white"
+            },
+        },
+        preferredCamera: 'camera2 0, facing back',
+        onDocumentDetected: result => handleDocumentDetection(result)
     }
 
     const handleDocumentScanner = async () => {
         try {
-            const config = {
-                ...basicConfig,
-                text: {
-                    hint: {
-                        OK: "Capturing your document...",
-                        OK_SmallSize: "The document is too small. Try moving closer.",
-                        OK_BadAngles:
-                            "This is a bad camera angle. Hold the device straight over the document.",
-                        OK_BadAspectRatio:
-                            "Rotate the device sideways, so that the document fits better into the screen.",
-                        OK_OffCenter: "Try holding the device at the center of the document.",
-                        Error_NothingDetected:
-                            "Please hold the device over a document to start scanning.",
-                        Error_Brightness: "It is too dark. Try turning on a light.",
-                        Error_Noise: "Please move the document to a clear surface.",
-                    },
-                },
-                style: {
-                    outline: {
-                        polygon: {
-                            fillCapturing: "rgba(0, 255, 0, 0.2)",
-                            strokeCapturing: "green",
-                            fillSearching: "rgba(255, 0, 0, 0.2)",
-                            strokeSearching: "red",
-                        },
-                        label: {
-                            position: "absolute",
-                            top: "90%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            textAlign: "center",
-                            backgroundColor: "rgba(0, 0, 0, 0.7)",
-                            color: "white",
-                            borderRadius: "0.25em",
-                            padding: "0.5em",
-                            fontFamily: "sans-serif",
-                            fontSize: "1em"
-                        },
-                        path: {
-                            stroke: "green",
-                            strokeWidth: 4,
-                        }
-                    },
-                    captureButton: {
-                        color: "white"
-                    },
-                },
-                preferredCamera: 'camera2 0, facing back',
-                onDocumentDetected: result => async () => { 
-                    handleDocumentDetection(result);
-                    (await ScanbotSDK.instance.createDocumentScanner(basicConfig)).dispose()
-                }
-            };
-            const scanner = (await ScanbotSDK.instance.createDocumentScanner(config));
-            setScannerInstance(scanner)
-            scanner.enableAutoCapture();
+            (await ScanbotSDK.instance.createDocumentScanner(scannerConfig)).enableAutoCapture()
         } catch (error) {
             console.log("ERROR:", error)
         }
@@ -111,23 +102,23 @@ const Scanbot = () => {
         const uint8Array = new Uint8Array(cropped);
         const blob = new Blob([uint8Array], { type: 'image/jpeg' });
         const imageUrl = URL.createObjectURL(blob);
-        if (imageUrl) setImgUrl(imageUrl)
-
+        if (imageUrl) {
+            setImgUrl(imageUrl)
+        }
     }
-
 
     return (
         <div>
             <h2>Document Scanner</h2>
 
-            {/* Document Scanner UI Container */}
             <div id={DOCUMENT_SCANNER_CONTAINER} style={{ position: "relative", height: "100%", width: "100%" }}>
                 <h3>Scanbot</h3>
                 <button onClick={() => handleDocumentScanner()}>Click Me!!!</button>
             </div>
+
             {
                 imgUrl && <>
-                    <h2>Preview of Scanned Document:</h2>
+                    <h2>Preview of Scanned Document</h2>
                     <img src={imgUrl} alt="Scanned Document" style={{ maxWidth: '100%' }} />
                 </>
             }
