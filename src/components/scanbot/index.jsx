@@ -1,8 +1,10 @@
 import ScanbotSDK from "scanbot-web-sdk";
-import "./scanbot.css"
+import "./scanbot.css";
+import { useEffect, useState } from "react";
 
 const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
+    const [scannerInstance, setScannerInstance] = useState(null)
 
     const LICENSE_KEY =
         "hEH0Wbx1pZJdQXqRVrvGc0yiGpAEPX" +
@@ -25,10 +27,26 @@ const Scanbot = () => {
     // Please refer to the corresponding setup guide in our documentation:
     // https://docs.scanbot.io
 
-    const handleDcoumentScanner = async () => {
+    useEffect(() => {
+        const init = async () => {
+            await ScanbotSDK.initialize({
+                licenseKey: LICENSE_KEY,
+                engine: "wasm"
+            })
+        }
+        init();
+    }, [LICENSE_KEY])
+
+    const [imgUrl, setImgUrl] = useState("")
+
+    const basicConfig = {
+        containerId: DOCUMENT_SCANNER_CONTAINER,
+    }
+
+    const handleDocumentScanner = async () => {
         try {
             const config = {
-                containerId: DOCUMENT_SCANNER_CONTAINER,
+                ...basicConfig,
                 text: {
                     hint: {
                         OK: "Capturing your document...",
@@ -75,29 +93,44 @@ const Scanbot = () => {
                     },
                 },
                 preferredCamera: 'camera2 0, facing back',
-                onDocumentDetected: result => {
-                    console.log("Detected Document:", result);
+                onDocumentDetected: result => async () => { 
+                    handleDocumentDetection(result);
+                    (await ScanbotSDK.instance.createDocumentScanner(basicConfig)).dispose()
                 }
             };
-
-            const initializeScanner = await ScanbotSDK.initialize({ licenseKey: LICENSE_KEY, engine: "wasm" });
-            const createScanner = (await initializeScanner.createDocumentScanner(config)).disableAutoCapture()
-            console.log("createScanner", createScanner)
-
+            const scanner = (await ScanbotSDK.instance.createDocumentScanner(config));
+            setScannerInstance(scanner)
+            scanner.enableAutoCapture();
         } catch (error) {
             console.log("ERROR:", error)
         }
     }
+
+    const handleDocumentDetection = async (result) => {
+        const { cropped } = result  //the value of cropped is of type Base64 image
+        const uint8Array = new Uint8Array(cropped);
+        const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+        const imageUrl = URL.createObjectURL(blob);
+        if (imageUrl) setImgUrl(imageUrl)
+
+    }
+
 
     return (
         <div>
             <h2>Document Scanner</h2>
 
             {/* Document Scanner UI Container */}
-            <div id={DOCUMENT_SCANNER_CONTAINER} style={{position:"relative"}}>
+            <div id={DOCUMENT_SCANNER_CONTAINER} style={{ position: "relative", height: "100%", width: "100%" }}>
                 <h3>Scanbot</h3>
-                <button onClick={() => handleDcoumentScanner()}>Click Me!!!</button>
+                <button onClick={() => handleDocumentScanner()}>Click Me!!!</button>
             </div>
+            {
+                imgUrl && <>
+                    <h2>Preview of Scanned Document:</h2>
+                    <img src={imgUrl} alt="Scanned Document" style={{ maxWidth: '100%' }} />
+                </>
+            }
         </div>
 
     )
