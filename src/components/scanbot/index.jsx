@@ -1,5 +1,4 @@
 import ScanbotSDK from "scanbot-web-sdk";
-import { useState } from "react";
 
 const Scanbot = () => {
     const DOCUMENT_SCANNER_CONTAINER = "document-scanner-view";
@@ -25,8 +24,6 @@ const Scanbot = () => {
     // Please refer to the corresponding setup guide in our documentation:
     // https://docs.scanbot.io
 
-    const [scannedImage, setScannedImage] = useState(null);
-
     const handleDcoumentScanner = async () => {
         try {
             const config = {
@@ -49,11 +46,10 @@ const Scanbot = () => {
                 style: {
                     outline: {
                         polygon: {
+                            fillCapturing: "rgba(0, 255, 0, 0.2)",
                             strokeCapturing: "green",
-                            strokeSearching: "yellow",
-                            fillCapturing: "transparent",
-                            fillSearching: "transparent",
-                            strokeWidth: "2px"
+                            fillSearching: "rgba(255, 0, 0, 0.2)",
+                            strokeSearching: "red",
                         },
                         label: {
                             position: "absolute",
@@ -69,8 +65,8 @@ const Scanbot = () => {
                             fontSize: "1em"
                         },
                         path: {
-                             stroke: "green",
-                             strokeWidth: 4,
+                            stroke: "green",
+                            strokeWidth: 4,
                         }
                     },
                     captureButton: {
@@ -78,23 +74,23 @@ const Scanbot = () => {
                     },
                 },
                 preferredCamera: 'camera2 0, facing back',
+                onDocumentDetected: result => {
+                    console.log("Detected Document:", result);
+                }
             };
-            const sdkInstance = await ScanbotSDK.initialize({
-                licenseKey: LICENSE_KEY
-            })
 
-            const scanner = (await sdkInstance.createDocumentScanner(config)).enableAutoCapture();
-            console.log("captureedImage", scanner)
-
+            const initializeScanner = await ScanbotSDK.initialize({ licenseKey: LICENSE_KEY, engine: "wasm" });
+            const createScanner = (await initializeScanner.createDocumentScanner(config)).enableAutoCapture()
+            console.log("createScanner", createScanner)
 
         } catch (error) {
             console.log("ERROR:", error)
         }
     }
     const scannerDimensionObject = {
-        width:'600px',
-        height:"400px",
-        border:"2px solid red",
+        width: '600px',
+        height: "400px",
+        border: "2px solid red",
     }
 
     return (
