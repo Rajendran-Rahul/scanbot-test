@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 const Scanbot = () => {
   const [imgUrl, setImgUrl] = useState("");
+  const [croppedValue, setCroppedValue] = useState(null);
 
   useEffect(() => {
     const initSDK = async () => {
@@ -18,7 +19,7 @@ const Scanbot = () => {
       }
     };
     initSDK();
-  }, [LICENSE_KEY]);
+  }, []);
 
   const scannerConfig = {
     containerId: DOCUMENT_SCANNER_CONTAINER,
@@ -68,15 +69,18 @@ const Scanbot = () => {
       },
     },
     preferredCamera: "camera2 0, facing back",
-    onDocumentDetected: (result) => handleDocumentDetection(result),
+    onDocumentDetected: (result) => {
+      console.log("result", result);
+      handleDocumentDetection(result);
+    },
   };
 
-  const scannerInstance = () =>
-    ScanbotSDK.instance.createDocumentScanner(scannerConfig);
+  const scannerInstance = async () =>
+    await ScanbotSDK.instance.createDocumentScanner(scannerConfig);
 
   const handleDocumentScanner = async () => {
     try {
-      (await scannerInstance()).enableAutoCapture();
+      await scannerInstance();
     } catch (error) {
       console.log("ERROR:", error);
     }
@@ -84,6 +88,7 @@ const Scanbot = () => {
 
   const handleDocumentDetection = async (result) => {
     const { cropped } = result; //the value of cropped is of type Uint8Array image
+    setCroppedValue(cropped);
     const uint8Array = new Uint8Array(cropped);
     const blob = new Blob([uint8Array], { type: "image/jpeg" });
     const imageUrl = URL.createObjectURL(blob);
@@ -95,7 +100,36 @@ const Scanbot = () => {
 
   const handlePostDocumentCapture = async () => {
     (await scannerInstance()).disableAutoCapture();
-    (await scannerInstance())?.dispose();
+    await scannerInstance().dispose();
+  };
+
+  const handleImageRotation = (imageUrl, angle) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const image = new Image();
+    image.src = imageUrl;
+
+    image.onload = () => {
+      const width = image.width;
+      const height = image.height;
+
+      // Set canvas size based on rotated image size
+      canvas.width = height; // Height becomes the width after rotation
+      canvas.height = width; // Width becomes the height after rotation
+
+      // Rotate the image using canvas API
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.translate(canvas.width / 2, canvas.height / 2); // Move to the center of the canvas
+      ctx.rotate((angle * Math.PI) / 180); // Convert angle to radians
+      ctx.drawImage(image, -width / 2, -height / 2); // Draw image at the center of the canvas
+
+      // Get the rotated image as a new URL (base64 encoded)
+      const rotatedImageUrl = canvas.toDataURL("image/jpeg");
+
+      // Update state with rotated image URL
+      setImgUrl(rotatedImageUrl);
+    };
   };
 
   return (
@@ -115,11 +149,16 @@ const Scanbot = () => {
       {imgUrl && (
         <>
           <h2>Preview of Scanned Document</h2>
-          <img
-            src={imgUrl}
-            alt="Scanned Document"
-            style={{ maxWidth: "100%" }}
-          />
+          <div className="preview-img-container">
+            <img
+              src={imgUrl}
+              alt="Scanned Document"
+              style={{ maxWidth: "100%" }}
+            />
+            <button onClick={() => handleImageRotation(imgUrl, 90)}>
+              Rotate Image
+            </button>
+          </div>
         </>
       )}
     </div>
